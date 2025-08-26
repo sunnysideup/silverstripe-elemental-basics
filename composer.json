@@ -1,0 +1,51 @@
+{
+  "name": "sunnysideup/elemental-basics",
+  "description": "Provides a Base Element Extension to Elemental that allows the content editor to make basic design / styling choices such as top and bottom margin and background colour",
+  "type": "silverstripe-vendormodule",
+  "keywords": [
+    "styling",
+    "design",
+    "elemental",
+    "extension",
+    "margin",
+    "padding",
+    "background-colour",
+    "blocks"
+  ],
+  "license": "BSD-3-Clause",
+  "require": {
+    "silverstripe/framework": "^5.0",
+    "silverstripe/admin": "^2.0"
+  },
+  "require-dev": {
+    "sunnysideup/sswebpack_engine_only": "dev-master",
+    "silverleague/ideannotator": "*",
+    "phpunit/phpunit": "^9.6",
+    "squizlabs/php_codesniffer": "^3.7",
+    "silverstripe/standards": "^1",
+    "phpstan/extension-installer": "^1.3"
+  },
+  "autoload": {
+    "psr-4": {
+      "Sunnysideup\\ElementalBasics\\": "src/"
+    }
+  },
+  "extra": {
+    "expose": [
+      "client/dist"
+    ]
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "bin": [
+    "bin/sake-npm-build-elemental-basics.sh",
+    "bin/sake-npm-watch-elemental-basics.sh"
+  ],
+  "authors": [
+    {
+      "name": "Nicolaas Thiemen Francken",
+      "email": "modules@sunnysideup.co.nz",
+      "role": "lead developer"
+    }
+  ]
+}
