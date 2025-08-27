@@ -1,1 +1,18 @@
-# see https://docs.silverstripe.org/en/developer_guides/configuration/configuration/
+---
+Name: modules-elemental-basics
+Before:
+  - '#modules-framework'
+---
+SilverStripe\Core\Manifest\ModuleManifest:
+  module_priority:
+    - sunnysideup/elemental-basics
+    - dnadesign/silverstripe-elemental
+
+DNADesign\Elemental\Models\BaseElement:
+  extensions:
+    - Sunnysideup\ElementalBasics\Extensions\BaseElementExtension
+
+Sunnysideup\SelectedColourPicker\Model\Fields\DBColour:
+  colours:
+    '#000000': 'Black'
+    '#ffffff': 'White'
