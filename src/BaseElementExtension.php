@@ -55,7 +55,7 @@ class BaseElementExtension extends Extension
                 ColorPaletteField::create(
                     'ElementTextColour',
                     'Text Colour',
-                    DBFontColour::get_colours_for_dropdown()
+                    DBFontColour::get_colours_for_dropdown(true)
                 ),
                 FieldGroup::create(
                     'Spacing',
