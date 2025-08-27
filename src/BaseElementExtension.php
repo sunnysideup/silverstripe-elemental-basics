@@ -26,6 +26,10 @@ class BaseElementExtension extends Extension
         'BottomMargin' => 'Enum("none, small, medium, large, xlarge", "medium")',
     ];
 
+    private static $defaults = [
+        'ElementBackgroundColour' => '#ffffff',
+        'ElementTextColour' => '#000000',
+    ];
 
     // Allow archiving elements even on pages that cannot be deleted (e.g., home page, pages with children)
     public function canDelete($member = null)
