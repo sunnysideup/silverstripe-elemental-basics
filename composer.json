@@ -32,17 +32,8 @@
       "Sunnysideup\\ElementalBasics\\": "src/"
     }
   },
-  "extra": {
-    "expose": [
-      "client/dist"
-    ]
-  },
   "minimum-stability": "dev",
   "prefer-stable": true,
-  "bin": [
-    "bin/sake-npm-build-elemental-basics.sh",
-    "bin/sake-npm-watch-elemental-basics.sh"
-  ],
   "authors": [
     {
       "name": "Nicolaas Thiemen Francken",
