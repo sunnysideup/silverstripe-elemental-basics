@@ -7,6 +7,7 @@ SilverStripe\Core\Manifest\ModuleManifest:
   module_priority:
     - sunnysideup/elemental-basics
     - dnadesign/silverstripe-elemental
+    - dnadesign/silverstripe-elemental-virtual
 
 DNADesign\Elemental\Models\BaseElement:
   extensions:
