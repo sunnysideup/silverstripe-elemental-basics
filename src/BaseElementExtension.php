@@ -4,6 +4,7 @@ namespace Sunnysideup\ElementalBasics\Extensions;
 
 use Fromholdio\ColorPalette\Fields\ColorPaletteField;
 use SilverStripe\Core\Extension;
+use SilverStripe\Forms\CheckboxField;
 use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\FieldGroup;
 use SilverStripe\Forms\FieldList;
@@ -13,7 +14,7 @@ use Sunnysideup\SelectedColourPicker\Model\Fields\DBFontColour;
 /**
  * Class \Sunnysideup\ElementalBasics\Extensions\BaseElementExtension
  *
- * @property \DNADesign\Elemental\Models\BaseElement|\App\Extensions\BaseElementExtension $owner
+ * @property \DNADesign\Elemental\Models\BaseElement|\App\Website\Extension\BaseElementExtension $owner
  */
 class BaseElementExtension extends Extension
 {
@@ -24,6 +25,8 @@ class BaseElementExtension extends Extension
         'BottomPadding' => 'Enum("none, small, medium, large, xlarge", "none")',
         'TopMargin' => 'Enum("none, small, medium, large, xlarge", "none")',
         'BottomMargin' => 'Enum("none, small, medium, large, xlarge", "none")',
+        'InvertTopMargin' => 'Boolean',
+        'InvertBottomMargin' => 'Boolean',
     ];
 
     private static $defaults = [
@@ -55,17 +58,17 @@ class BaseElementExtension extends Extension
         $topPaddingValues = $owner->dbObject('TopPadding')->enumValues();
         $bottomPaddingValues = $owner->dbObject('BottomPadding')->enumValues();
         $bottomMarginValues = $owner->dbObject('BottomMargin')->enumValues();
-        if ($owner->hasMethod('CustomTopMarginValues')) {
-            $topMarginValues = $owner->CustomTopMarginValues();
+        if ($owner->hasMethod('getCustomTopMarginValues')) {
+            $topMarginValues = $owner->getCustomTopMarginValues($topMarginValues);
         }
-        if ($owner->hasMethod('CustomTopPaddingValues')) {
-            $topPaddingValues = $owner->CustomTopPaddingValues();
+        if ($owner->hasMethod('getCustomTopPaddingValues')) {
+            $topPaddingValues = $owner->getCustomTopPaddingValues($topPaddingValues);
         }
-        if ($owner->hasMethod('CustomBottomPaddingValues')) {
-            $bottomPaddingValues = $owner->CustomBottomPaddingValues();
+        if ($owner->hasMethod('getCustomBottomPaddingValues')) {
+            $bottomPaddingValues = $owner->getCustomBottomPaddingValues($bottomPaddingValues);
         }
-        if ($owner->hasMethod('CustomBottomMarginValues')) {
-            $bottomMarginValues = $owner->CustomBottomMarginValues();
+        if ($owner->hasMethod('getCustomBottomMarginValues')) {
+            $bottomMarginValues = $owner->getCustomBottomMarginValues($bottomMarginValues);
         }
         $fields->addFieldsToTab(
             'Root.Settings',
@@ -88,6 +91,10 @@ class BaseElementExtension extends Extension
                         'Top Margin',
                         $topMarginValues
                     ),
+                    CheckboxField::create(
+                        'InvertTopMargin',
+                        'Invert Top Margin - overlap with previous block'
+                    ),
                     DropdownField::create(
                         'TopPadding',
                         'Top Padding',
@@ -98,6 +105,10 @@ class BaseElementExtension extends Extension
                         'Bottom Padding',
                         $bottomPaddingValues
                     ),
+                    CheckboxField::create(
+                        'InvertBottomMargin',
+                        'Invert Bottom Margin - overlap with next block'
+                    ),
                     DropdownField::create(
                         'BottomMargin',
                         'Bottom Margin',
@@ -106,5 +117,35 @@ class BaseElementExtension extends Extension
                 )
             ]
         );
+    }
+
+    public function updateStyleVariant($styleVariant)
+    {
+        $owner = $this->getOwner();
+        if ($owner->ElementBackgroundColour) {
+            $styleVariant .= ' bg-' . str_replace('#', '', $owner->ElementBackgroundColour);
+        }
+        if ($owner->ElementTextColour) {
+            $styleVariant .= ' text-' . str_replace('#', '', $owner->ElementTextColour);
+        }
+        if ($owner->TopPadding && $owner->TopPadding !== 'none') {
+            $styleVariant .= ' pt-' . $owner->TopPadding;
+        }
+        if ($owner->BottomPadding && $owner->BottomPadding !== 'none') {
+            $styleVariant .= ' pb-' . $owner->BottomPadding;
+        }
+        if ($owner->TopMargin && $owner->TopMargin !== 'none') {
+            $styleVariant .= ' mt-' . $owner->TopMargin;
+            if ($owner->InvertTopMargin) {
+                $styleVariant .= ' mt-invert';
+            }
+        }
+        if ($owner->BottomMargin && $owner->BottomMargin !== 'none') {
+            $styleVariant .= ' mb-' . $owner->BottomMargin;
+            if ($owner->InvertBottomMargin) {
+                $styleVariant .= ' mb-invert';
+            }
+        }
+        return trim($styleVariant);
     }
 }
