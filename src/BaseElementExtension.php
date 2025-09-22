@@ -92,11 +92,6 @@ class BaseElementExtension extends Extension
             }
         }
 
-
-        $fields->removeByName('TopPadding');
-        $fields->removeByName('BottomPadding');
-        $fields->removeByName('TopMargin');
-        $fields->removeByName('BottomMargin');
         $options = $owner->config()->get('margin_and_padding_options');
         $marginAndPaddingOptions = array_combine(
             $options,
