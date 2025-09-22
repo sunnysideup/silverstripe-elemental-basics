@@ -92,6 +92,13 @@ class BaseElementExtension extends Extension
             }
         }
 
+        if (!empty($fieldsToAdd)) {
+            $fields->addFieldsToTab(
+                'Root.Colours',
+                $fieldsToAdd
+            );
+        }
+
         $options = $owner->config()->get('margin_and_padding_options');
         $marginAndPaddingOptions = array_combine(
             $options,
@@ -152,16 +159,13 @@ class BaseElementExtension extends Extension
                 }
             }
         }
+        if (! empty($fieldsToAdd)) {
 
-        $fields->addFieldsToTab(
-            'Root.Settings',
-            [
-                FieldGroup::create(
-                    'Spacing',
-                    $fieldsToAdd
-                )
-            ]
-        );
+            $fields->addFieldsToTab(
+                'Root.Spacing',
+                $fieldsToAdd
+            );
+        }
     }
 
     public function updateStyleVariant($styleVariant)
