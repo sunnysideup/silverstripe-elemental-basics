@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Sunnysideup\ElementalBasics\Extensions;
 
+use Dom\Element;
 use Fromholdio\ColorPalette\Fields\ColorPaletteField;
 use SilverStripe\Core\Extension;
 use SilverStripe\Forms\CheckboxField;
@@ -20,17 +23,17 @@ class BaseElementExtension extends Extension
 {
 
     private static $margin_and_padding_options = [
-        'none',
-        'small',
-        'medium',
-        'large',
-        'xlarge',
+        // 'none',
+        // 'small',
+        // 'medium',
+        // 'large',
+        // 'xlarge',
     ];
 
     private static $element_width_options = [
-        'full-width',
-        'normal-width',
-        'text-width'
+        // 'full-width',
+        // 'normal-width',
+        // 'text-width'
     ];
 
     private static $db = [
@@ -62,6 +65,7 @@ class BaseElementExtension extends Extension
     public function updateCMSFields(FieldList $fields)
     {
         $owner = $this->getOwner();
+        $labels = $owner->fieldLabels();
         $backgroundColours = DBBackgroundColour::get_colours_for_dropdown();
         $textColours = DBFontColour::get_colours_for_dropdown();
         if ($owner->hasMethod('getCustomBackgroundColours')) {
@@ -70,21 +74,24 @@ class BaseElementExtension extends Extension
         if ($owner->hasMethod('getCustomTextColours')) {
             $textColours = $owner->getCustomTextColours($textColours);
         }
-        $fields->addFieldsToTab(
-            'Root.Settings',
-            [
-                ColorPaletteField::create(
-                    'ElementBackgroundColour',
-                    'Background Colour',
-                    $backgroundColours
-                ),
-                ColorPaletteField::create(
-                    'ElementTextColour',
-                    'Text Colour',
-                    $textColours
-                ),
-            ]
-        );
+        $fieldsToAdd = [];
+        $colours = [
+            'ElementBackgroundColour' => $backgroundColours,
+            'ElementTextColour' => $textColours,
+        ];
+        foreach ($colours as $fieldName => $values) {
+            if (! empty($values)) {
+                $label = $labels[$fieldName] ?? $fieldName;
+                $fieldsToAdd[] = ColorPaletteField::create(
+                    $fieldName,
+                    $label,
+                    $values
+                )->setEmptyString('-- select colour --');
+            } else {
+                $fields->removeByName($fieldName);
+            }
+        }
+
 
         $fields->removeByName('TopPadding');
         $fields->removeByName('BottomPadding');
@@ -128,10 +135,9 @@ class BaseElementExtension extends Extension
             'BottomPadding' => $bottomPaddingValues,
             'BottomMargin' => $bottomMarginValues,
         ];
-        $labels = $owner->fieldLabels();
         $fieldsToAdd = [];
         foreach ($settings as $fieldName => $values) {
-            if (!empty($values) && is_array($values) && count($values)) {
+            if (!empty($values)) {
                 $label = $labels[$fieldName] ?? $fieldName;
                 $fieldsToAdd[] = DropdownField::create(
                     $fieldName,
@@ -143,6 +149,11 @@ class BaseElementExtension extends Extension
                         'Invert' . $fieldName,
                         $labels['Invert' . $fieldName] ?? 'Invert ' . $label . ' - overlap with ' . ($fieldName === 'TopMargin' ? 'previous' : 'next') . ' block?'
                     );
+                }
+            } else {
+                $fields->removeByName($fieldName);
+                if ($fieldName === 'TopMargin' || $fieldName === 'BottomMargin') {
+                    $fields->removeByName('Invert' . $fieldName);
                 }
             }
         }
