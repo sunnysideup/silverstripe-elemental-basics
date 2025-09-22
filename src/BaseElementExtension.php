@@ -18,21 +18,33 @@ use Sunnysideup\SelectedColourPicker\Model\Fields\DBFontColour;
  */
 class BaseElementExtension extends Extension
 {
+
+    private static $margin_and_padding_options = [
+        'none',
+        'small',
+        'medium',
+        'large',
+        'xlarge',
+    ];
+
+    private static $element_width_options = [
+        'full-width',
+        'normal-width',
+        'text-width'
+    ];
+
     private static $db = [
         'ElementBackgroundColour' => 'BackgroundColour',
         'ElementTextColour' => 'FontColour',
-        'TopPadding' => 'Enum("none, small, medium, large, xlarge", "none")',
-        'BottomPadding' => 'Enum("none, small, medium, large, xlarge", "none")',
-        'TopMargin' => 'Enum("none, small, medium, large, xlarge", "none")',
-        'BottomMargin' => 'Enum("none, small, medium, large, xlarge", "none")',
+        'TopMargin' => 'Varchar(30)',
         'InvertTopMargin' => 'Boolean',
+        'TopPadding' => 'Varchar(30)',
+        'ElementWidth' => 'Varchar(30)',
+        'BottomPadding' => 'Varchar(30)',
+        'BottomMargin' => 'Varchar(30)',
         'InvertBottomMargin' => 'Boolean',
     ];
 
-    private static $defaults = [
-        'ElementBackgroundColour' => '#ffffff',
-        'ElementTextColour' => '#000000',
-    ];
 
     /**
      * Small hack!
@@ -50,14 +62,44 @@ class BaseElementExtension extends Extension
     public function updateCMSFields(FieldList $fields)
     {
         $owner = $this->getOwner();
+        $backgroundColours = DBBackgroundColour::get_colours_for_dropdown();
+        $textColours = DBFontColour::get_colours_for_dropdown();
+        if ($owner->hasMethod('getCustomBackgroundColours')) {
+            $backgroundColours = $owner->getCustomBackgroundColours($backgroundColours);
+        }
+        if ($owner->hasMethod('getCustomTextColours')) {
+            $textColours = $owner->getCustomTextColours($textColours);
+        }
+        $fields->addFieldsToTab(
+            'Root.Settings',
+            [
+                ColorPaletteField::create(
+                    'ElementBackgroundColour',
+                    'Background Colour',
+                    $backgroundColours
+                ),
+                ColorPaletteField::create(
+                    'ElementTextColour',
+                    'Text Colour',
+                    $textColours
+                ),
+            ]
+        );
+
         $fields->removeByName('TopPadding');
         $fields->removeByName('BottomPadding');
         $fields->removeByName('TopMargin');
         $fields->removeByName('BottomMargin');
-        $topMarginValues = $owner->dbObject('TopMargin')->enumValues();
-        $topPaddingValues = $owner->dbObject('TopPadding')->enumValues();
-        $bottomPaddingValues = $owner->dbObject('BottomPadding')->enumValues();
-        $bottomMarginValues = $owner->dbObject('BottomMargin')->enumValues();
+        $options = $owner->config()->get('margin_and_padding_options');
+        $marginAndPaddingOptions = array_combine(
+            $options,
+            $options
+        );
+        $topMarginValues = $marginAndPaddingOptions;
+        $topPaddingValues = $marginAndPaddingOptions;
+        $bottomPaddingValues = $marginAndPaddingOptions;
+        $bottomMarginValues = $marginAndPaddingOptions;
+
         if ($owner->hasMethod('getCustomTopMarginValues')) {
             $topMarginValues = $owner->getCustomTopMarginValues($topMarginValues);
         }
@@ -70,50 +112,47 @@ class BaseElementExtension extends Extension
         if ($owner->hasMethod('getCustomBottomMarginValues')) {
             $bottomMarginValues = $owner->getCustomBottomMarginValues($bottomMarginValues);
         }
+        $options = $owner->config()->get('element_width_options');
+        $elementWidthValues = array_combine(
+            $options,
+            $options
+        );
+
+        if ($owner->hasMethod('getCustomElementWidthValues')) {
+            $elementWidthValues = $owner->getCustomElementWidthValues($elementWidthValues);
+        }
+        $settings = [
+            'TopMargin' => $topMarginValues,
+            'TopPadding' => $topPaddingValues,
+            'ElementWidth' => $elementWidthValues,
+            'BottomPadding' => $bottomPaddingValues,
+            'BottomMargin' => $bottomMarginValues,
+        ];
+        $labels = $owner->fieldLabels();
+        $fieldsToAdd = [];
+        foreach ($settings as $fieldName => $values) {
+            if (!empty($values) && is_array($values) && count($values)) {
+                $label = $labels[$fieldName] ?? $fieldName;
+                $fieldsToAdd[] = DropdownField::create(
+                    $fieldName,
+                    $label,
+                    $values
+                );
+                if ($fieldName === 'TopMargin' || $fieldName === 'BottomMargin') {
+                    $fieldsToAdd[] = CheckboxField::create(
+                        'Invert' . $fieldName,
+                        $labels['Invert' . $fieldName] ?? 'Invert ' . $label . ' - overlap with ' . ($fieldName === 'TopMargin' ? 'previous' : 'next') . ' block?'
+                    );
+                }
+            }
+        }
+
         $fields->addFieldsToTab(
             'Root.Settings',
             [
-                ColorPaletteField::create(
-                    'ElementBackgroundColour',
-                    'Background Colour',
-                    DBBackgroundColour::get_colours_for_dropdown()
-                ),
-                ColorPaletteField::create(
-                    'ElementTextColour',
-                    'Text Colour',
-                    DBFontColour::get_colours_for_dropdown()
-                ),
-
                 FieldGroup::create(
                     'Spacing',
-                    DropdownField::create(
-                        'TopMargin',
-                        'Top Margin',
-                        $topMarginValues
-                    ),
-                    CheckboxField::create(
-                        'InvertTopMargin',
-                        'Invert Top Margin - overlap with previous block'
-                    ),
-                    DropdownField::create(
-                        'TopPadding',
-                        'Top Padding',
-                        $topPaddingValues
-                    ),
-                    DropdownField::create(
-                        'BottomPadding',
-                        'Bottom Padding',
-                        $bottomPaddingValues
-                    ),
-                    CheckboxField::create(
-                        'InvertBottomMargin',
-                        'Invert Bottom Margin - overlap with next block'
-                    ),
-                    DropdownField::create(
-                        'BottomMargin',
-                        'Bottom Margin',
-                        $bottomMarginValues
-                    )
+                    $fieldsToAdd
                 )
             ]
         );
@@ -133,6 +172,9 @@ class BaseElementExtension extends Extension
         }
         if ($owner->BottomPadding && $owner->BottomPadding !== 'none') {
             $styleVariant .= ' pb-' . $owner->BottomPadding;
+        }
+        if ($owner->ElementWidth && $owner->ElementWidth !== 'none') {
+            $styleVariant .= ' ew-' . $owner->ElementWidth;
         }
         if ($owner->TopMargin && $owner->TopMargin !== 'none') {
             $styleVariant .= ' mt-' . $owner->TopMargin;
