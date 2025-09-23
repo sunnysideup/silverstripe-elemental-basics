@@ -1,7 +1,7 @@
 ---
 Name: modules-elemental-basics
 Before:
-  - '#modules-framework'
+  - "#modules-framework"
 ---
 SilverStripe\Core\Manifest\ModuleManifest:
   module_priority:
@@ -15,5 +15,6 @@ DNADesign\Elemental\Models\BaseElement:
 
 Sunnysideup\SelectedColourPicker\Model\Fields\DBColour:
   colours:
-    '#000000': 'Black'
-    '#ffffff': 'White'
+    "transparent": "Transparent"
+    "#000000": "Black"
+    "#ffffff": "White"

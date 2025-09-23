@@ -12,16 +12,21 @@ See `sunnysideup/selected-colour-picker` module.
 ## set up defaults
 
 ```yml
-
+---
+name: ElementalBasicsConfiguration
+---
 Sunnysideup\ElementalBasics\Extensions\BaseElementExtension:
   margin_and_padding_options:
+    - none
     - small
     - medium
     - large
+    - xlarge
   element_width_options:
     - full-width
     - normal
     - text-width
+
 
 ```
 
@@ -69,7 +74,7 @@ class MyDataObject extends DataObject
         ];
     }
 
-    public function getCustomElementWidthValues()
+    public function getCustomElementWidthValues(array $values): array
     {
         return [
             'full-width' => 'full width'
