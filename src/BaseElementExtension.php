@@ -200,4 +200,10 @@ class BaseElementExtension extends Extension
         }
         return trim($styleVariant);
     }
+
+    public function getAnchorTitle()
+    {
+        $owner = $this->getOwner();
+        return 'page-section-' . ($owner->getField('Title') ?: '#' . $this->owner->ID);
+    }
 }
