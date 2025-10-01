@@ -204,6 +204,9 @@ class BaseElementExtension extends Extension
     public function getAnchorTitle()
     {
         $owner = $this->getOwner();
-        return 'page-section-' . ($owner->getField('Title') ?: '#' . $this->owner->ID);
+        if ($owner->config()->enable_title_in_template) {
+            return $owner->getField('Title');
+        }
+        return 'page-section-' . ($owner->getField('Title') ?: '#' . $owner->ID);
     }
 }
