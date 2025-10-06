@@ -11,6 +11,7 @@ use SilverStripe\Forms\CheckboxField;
 use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\FieldGroup;
 use SilverStripe\Forms\FieldList;
+use SilverStripe\Forms\LiteralField;
 use SilverStripe\Forms\Tab;
 use Sunnysideup\SelectedColourPicker\Model\Fields\DBBackgroundColour;
 use Sunnysideup\SelectedColourPicker\Model\Fields\DBFontColour;
@@ -49,6 +50,18 @@ class BaseElementExtension extends Extension
         'InvertBottomMargin' => 'Boolean',
     ];
 
+    private static $field_labels = [
+        'ElementBackgroundColour' => 'Background Colour',
+        'ElementTextColour' => 'Font Colour',
+        'TopMargin' => 'Top Margin (space outside block)',
+        'InvertTopMargin' => 'Invert Top Margin - overlap with previous block?',
+        'TopPadding' => 'Top Padding (space inside block)',
+        'ElementWidth' => 'Width of content',
+        'BottomPadding' => 'Bottom Padding (space inside block)',
+        'BottomMargin' => 'Bottom Margin (space outside block)',
+        'InvertBottomMargin' => 'Invert Bottom Margin - overlap with next block?',
+    ];
+
 
     /**
      * Small hack!
@@ -68,53 +81,7 @@ class BaseElementExtension extends Extension
         $owner = $this->getOwner();
         $labels = $owner->fieldLabels();
 
-        $fields->insertAfter(
-            'Main',
-            Tab::create(
-                'Colours',
-                'Colours',
-            )
-        );
-        $backgroundColours = DBBackgroundColour::get_colours_for_dropdown();
-        $textColours = DBFontColour::get_colours_for_dropdown();
-        if ($owner->hasMethod('getCustomBackgroundColours')) {
-            $backgroundColours = $owner->getCustomBackgroundColours($backgroundColours);
-        }
-        if ($owner->hasMethod('getCustomTextColours')) {
-            $textColours = $owner->getCustomTextColours($textColours);
-        }
-        $fieldsToAdd = [];
-        $colours = [
-            'ElementBackgroundColour' => $backgroundColours,
-            'ElementTextColour' => $textColours,
-        ];
-        foreach ($colours as $fieldName => $values) {
-            if (! empty($values)) {
-                $label = $labels[$fieldName] ?? $fieldName;
-                $fieldsToAdd[] = ColorPaletteField::create(
-                    $fieldName,
-                    $label,
-                    $values
-                )->setEmptyString('-- select colour --');
-            } else {
-                $fields->removeByName($fieldName);
-            }
-        }
 
-        if (!empty($fieldsToAdd)) {
-            $fields->addFieldsToTab(
-                'Root.Colours',
-                $fieldsToAdd
-            );
-        }
-
-        $fields->insertAfter(
-            'Main',
-            Tab::create(
-                'Spacing',
-                'Spacing',
-            )
-        );
 
         $options = $owner->config()->get('margin_and_padding_options');
         $marginAndPaddingOptions = array_combine(
@@ -127,16 +94,16 @@ class BaseElementExtension extends Extension
         $bottomMarginValues = $marginAndPaddingOptions;
 
         if ($owner->hasMethod('getCustomTopMarginValues')) {
-            $topMarginValues = $owner->getCustomTopMarginValues($topMarginValues);
+            $topMarginValues = $this->makeArrayAssociativeForCMSFields($owner->getCustomTopMarginValues($topMarginValues));
         }
         if ($owner->hasMethod('getCustomTopPaddingValues')) {
-            $topPaddingValues = $owner->getCustomTopPaddingValues($topPaddingValues);
+            $topPaddingValues = $this->makeArrayAssociativeForCMSFields($owner->getCustomTopPaddingValues($topPaddingValues));
         }
         if ($owner->hasMethod('getCustomBottomPaddingValues')) {
-            $bottomPaddingValues = $owner->getCustomBottomPaddingValues($bottomPaddingValues);
+            $bottomPaddingValues = $this->makeArrayAssociativeForCMSFields($owner->getCustomBottomPaddingValues($bottomPaddingValues));
         }
         if ($owner->hasMethod('getCustomBottomMarginValues')) {
-            $bottomMarginValues = $owner->getCustomBottomMarginValues($bottomMarginValues);
+            $bottomMarginValues = $this->makeArrayAssociativeForCMSFields($owner->getCustomBottomMarginValues($bottomMarginValues));
         }
         $options = $owner->config()->get('element_width_options');
         $elementWidthValues = array_combine(
@@ -155,32 +122,116 @@ class BaseElementExtension extends Extension
             'BottomMargin' => $bottomMarginValues,
         ];
         $fieldsToAdd = [];
+        $fieldsToAddInner = [];
+        $isTop = true;
         foreach ($settings as $fieldName => $values) {
             if (!empty($values)) {
+                //add top ones together
+                if ($fieldName === 'ElementWidth' && !empty($fieldsToAddInner)) {
+                    $fieldsToAdd[] = FieldGroup::create(
+                        $fieldsToAddInner
+                    );
+                    $fieldsToAddInner = [];
+                } elseif (strpos($fieldName, 'Bottom') === 0 && $isTop) {
+                    // adds middle one
+                    if (! empty($fieldsToAddInner)) {
+                        $fieldsToAdd[] = FieldGroup::create(
+                            $fieldsToAddInner
+                        );
+                        $fieldsToAddInner = [];
+                    }
+                    $isTop = false;
+                }
                 $label = $labels[$fieldName] ?? $fieldName;
-                $fieldsToAdd[] = DropdownField::create(
+                $fieldsToAddInner[] = DropdownField::create(
                     $fieldName,
                     $label,
                     $values
                 );
                 if ($fieldName === 'TopMargin' || $fieldName === 'BottomMargin') {
-                    $fieldsToAdd[] = CheckboxField::create(
+                    $fieldsToAddInner[] = CheckboxField::create(
                         'Invert' . $fieldName,
                         $labels['Invert' . $fieldName] ?? 'Invert ' . $label . ' - overlap with ' . ($fieldName === 'TopMargin' ? 'previous' : 'next') . ' block?'
                     );
                 }
-            } else {
-                $fields->removeByName($fieldName);
-                if ($fieldName === 'TopMargin' || $fieldName === 'BottomMargin') {
-                    $fields->removeByName('Invert' . $fieldName);
-                }
             }
+            $fields->removeByName($fieldName);
+            if ($fieldName === 'TopMargin' || $fieldName === 'BottomMargin') {
+                $fields->removeByName('Invert' . $fieldName);
+            }
+        }
+        if (! empty($fieldsToAddInner)) {
+            $fieldsToAdd[] = FieldGroup::create(
+                $fieldsToAddInner
+            );
         }
         if (! empty($fieldsToAdd)) {
 
-            $fields->addFieldsToTab(
-                'Root.Spacing',
-                $fieldsToAdd
+            $fields->insertAfter(
+                'Main',
+                Tab::create(
+                    'Spacing',
+                    'Spacing',
+                    ...$fieldsToAdd
+                )
+            );
+        }
+
+
+        $backgroundColours = DBBackgroundColour::get_colours_for_dropdown();
+        $textColours = DBFontColour::get_colours_for_dropdown();
+        if ($owner->hasMethod('getCustomBackgroundColours')) {
+            $backgroundColours = $this->makeArrayAssociativeForCMSFields($owner->getCustomBackgroundColours($backgroundColours));
+            $backgroundColours = $this->alignColoursForCMSFields($backgroundColours);
+        }
+        if ($owner->hasMethod('getCustomTextColours')) {
+            $textColours = $this->makeArrayAssociativeForCMSFields($owner->getCustomTextColours($textColours));
+            $textColours = $this->alignColoursForCMSFields($textColours);
+        }
+        $fieldsToAdd = [];
+        $colours = [
+            'ElementBackgroundColour' => $backgroundColours,
+            'ElementTextColour' => $textColours,
+        ];
+        foreach ($colours as $fieldName => $values) {
+            if (! empty($values)) {
+                $label = $labels[$fieldName] ?? $fieldName;
+                $fieldsToAdd[] = ColorPaletteField::create(
+                    $fieldName,
+                    $label,
+                    $values,
+                )->setEmptyString('-- select colour --');
+            }
+            $fields->removeByName($fieldName);
+        }
+
+        if (!empty($fieldsToAdd)) {
+            $fieldsToAdd[] =
+                new LiteralField(
+                    'ColourHack',
+                    '
+                    <style>
+
+                        .ColorPaletteField.colorpalettefield.ColorPaletteField li.ColorPaletteField__color label:before {
+                            left: 0 !important;
+                        }
+                        .ColorPaletteField__color:not([data-colorpalette-label]) {
+                            label:before {
+                                content: "not set" !important;
+                                font-size: 12px!important;
+                            }
+                        }
+                    </style>
+                '
+                );
+
+            $fields->insertAfter(
+                'Main',
+                Tab::create(
+                    'Colours',
+                    'Colours',
+                    ...$fieldsToAdd
+                )
             );
         }
     }
@@ -226,5 +277,29 @@ class BaseElementExtension extends Extension
             return $owner->getField('Title');
         }
         return 'page-section-' . ($owner->getField('Title') ?: '#' . $owner->ID);
+    }
+    protected function makeArrayAssociativeForCMSFields(array $list): array
+    {
+        if ($list === [] || array_keys($list) !== range(0, count($list) - 1)) {
+            // already associative or empty
+            return $list;
+        }
+
+        return array_combine($list, $list);
+    }
+
+    protected function alignColoursForCMSFields(array $colours): array
+    {
+        foreach ($colours as $key => $value) {
+            if (!is_array($value)) {
+                $colours[$key] = [
+                    'label' => $value,
+                    'background_css' => $key,
+                    'color_css' => '',
+                    'sample_text' => 'Aa',
+                ];
+            }
+        }
+        return $colours;
     }
 }

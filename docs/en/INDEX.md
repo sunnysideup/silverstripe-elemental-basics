@@ -109,39 +109,47 @@ Here is a css example that you may want to set up to cover the colours and the l
 .text-ffffff, .text-ffffff * { color: rgb(255, 255, 255); }
 .text-ff0000, .text-ff0000 * { color: rgb(255, 0, 0); }
 
+:root {
+  --space-none: 0;
+  --space-small: 0.5rem;
+  --space-medium: 1rem;
+  --space-large: 2rem;
+  --space-xlarge: 4rem;
+}
+
 /* Padding top */
-.pt-none    { padding-top: 0; }
-.pt-small   { padding-top: 0.5rem; }
-.pt-medium  { padding-top: 1rem; }
-.pt-large   { padding-top: 2rem; }
-.pt-xlarge  { padding-top: 4rem; }
+.pt-none { padding-top: var(--space-none); }
+.pt-small { padding-top: var(--space-small); }
+.pt-medium { padding-top: var(--space-medium); }
+.pt-large { padding-top: var(--space-large); }
+.pt-xlarge { padding-top: var(--space-xlarge); }
 
 /* Padding bottom */
-.pb-none    { padding-bottom: 0; }
-.pb-small   { padding-bottom: 0.5rem; }
-.pb-medium  { padding-bottom: 1rem; }
-.pb-large   { padding-bottom: 2rem; }
-.pb-xlarge  { padding-bottom: 4rem; }
+.pb-none { padding-bottom: var(--space-none); }
+.pb-small { padding-bottom: var(--space-small); }
+.pb-medium { padding-bottom: var(--space-medium); }
+.pb-large { padding-bottom: var(--space-large); }
+.pb-xlarge { padding-bottom: var(--space-xlarge); }
 
 /* Margin top */
-.mt-none         { margin-top: 0; }
-.mt-small        { margin-top: 0.5rem; }
-.mt-medium       { margin-top: 1rem; }
-.mt-large        { margin-top: 2rem; }
-.mt-xlarge       { margin-top: 4rem; }
-.mt-small-invert { margin-top: -0.5rem; }
-.mt-medium-invert{ margin-top: -1rem; }
-.mt-large-invert { margin-top: -2rem; }
-.mt-xlarge-invert{ margin-top: -4rem; }
+.mt-none { margin-top: var(--space-none); }
+.mt-small { margin-top: var(--space-small); }
+.mt-medium { margin-top: var(--space-medium); }
+.mt-large { margin-top: var(--space-large); }
+.mt-xlarge { margin-top: var(--space-xlarge); }
+.mt-small-invert { margin-top: calc(var(--space-small) * -1); }
+.mt-medium-invert { margin-top: calc(var(--space-medium) * -1); }
+.mt-large-invert { margin-top: calc(var(--space-large) * -1); }
+.mt-xlarge-invert { margin-top: calc(var(--space-xlarge) * -1); }
 
 /* Margin bottom */
-.mb-none         { margin-bottom: 0; }
-.mb-small        { margin-bottom: 0.5rem; }
-.mb-medium       { margin-bottom: 1rem; }
-.mb-large        { margin-bottom: 2rem; }
-.mb-xlarge       { margin-bottom: 4rem; }
-.mb-small-invert { margin-bottom: -0.5rem; }
-.mb-medium-invert{ margin-bottom: -1rem; }
-.mb-large-invert { margin-bottom: -2rem; }
-.mb-xlarge-invert{ margin-bottom: -4rem; }
+.mb-none { margin-bottom: var(--space-none); }
+.mb-small { margin-bottom: var(--space-small); }
+.mb-medium { margin-bottom: var(--space-medium); }
+.mb-large { margin-bottom: var(--space-large); }
+.mb-xlarge { margin-bottom: var(--space-xlarge); }
+.mb-small-invert { margin-bottom: calc(var(--space-small) * -1); }
+.mb-medium-invert { margin-bottom: calc(var(--space-medium) * -1); }
+.mb-large-invert { margin-bottom: calc(var(--space-large) * -1); }
+.mb-xlarge-invert { margin-bottom: calc(var(--space-xlarge) * -1); }
 ```
