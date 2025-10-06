@@ -201,4 +201,13 @@ class BaseElementExtension extends Extension
         }
         return trim($styleVariant);
     }
+
+    public function getAnchorTitle()
+    {
+        $owner = $this->getOwner();
+        if ($owner->config()->enable_title_in_template) {
+            return $owner->getField('Title');
+        }
+        return 'page-section-' . ($owner->getField('Title') ?: '#' . $owner->ID);
+    }
 }
