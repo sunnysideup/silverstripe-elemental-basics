@@ -11,6 +11,7 @@ use SilverStripe\Forms\CheckboxField;
 use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\FieldGroup;
 use SilverStripe\Forms\FieldList;
+use SilverStripe\Forms\Tab;
 use Sunnysideup\SelectedColourPicker\Model\Fields\DBBackgroundColour;
 use Sunnysideup\SelectedColourPicker\Model\Fields\DBFontColour;
 
@@ -66,6 +67,14 @@ class BaseElementExtension extends Extension
     {
         $owner = $this->getOwner();
         $labels = $owner->fieldLabels();
+
+        $fields->insertAfter(
+            'Main',
+            Tab::create(
+                'Colours',
+                'Colours',
+            )
+        );
         $backgroundColours = DBBackgroundColour::get_colours_for_dropdown();
         $textColours = DBFontColour::get_colours_for_dropdown();
         if ($owner->hasMethod('getCustomBackgroundColours')) {
@@ -98,6 +107,14 @@ class BaseElementExtension extends Extension
                 $fieldsToAdd
             );
         }
+
+        $fields->insertAfter(
+            'Main',
+            Tab::create(
+                'Spacing',
+                'Spacing',
+            )
+        );
 
         $options = $owner->config()->get('margin_and_padding_options');
         $marginAndPaddingOptions = array_combine(
@@ -168,7 +185,7 @@ class BaseElementExtension extends Extension
         }
     }
 
-    public function updateStyleVariant(?string &$styleVariant = null) :string
+    public function updateStyleVariant(?string &$styleVariant = null): string
     {
         $styleVariant = (string) $styleVariant;
         $owner = $this->getOwner();
