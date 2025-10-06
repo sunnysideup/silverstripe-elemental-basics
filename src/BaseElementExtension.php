@@ -168,8 +168,9 @@ class BaseElementExtension extends Extension
         }
     }
 
-    public function updateStyleVariant($styleVariant)
+    public function updateStyleVariant(?string &$styleVariant = null) :string
     {
+        $styleVariant = (string) $styleVariant;
         $owner = $this->getOwner();
         if ($owner->ElementBackgroundColour) {
             $styleVariant .= ' bg-' . str_replace('#', '', $owner->ElementBackgroundColour);
