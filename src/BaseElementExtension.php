@@ -143,16 +143,25 @@ class BaseElementExtension extends Extension
                     $isTop = false;
                 }
                 $label = $labels[$fieldName] ?? $fieldName;
-                $fieldsToAddInner[] = DropdownField::create(
+                $dd = DropdownField::create(
                     $fieldName,
                     $label,
                     $values
                 );
                 if ($fieldName === 'TopMargin' || $fieldName === 'BottomMargin') {
-                    $fieldsToAddInner[] = CheckboxField::create(
+                    $ddInvert = CheckboxField::create(
                         'Invert' . $fieldName,
                         $labels['Invert' . $fieldName] ?? 'Invert ' . $label . ' - overlap with ' . ($fieldName === 'TopMargin' ? 'previous' : 'next') . ' block?'
                     );
+                    if ($fieldName === 'TopMargin') {
+                        $fieldsToAddInner[] = $ddInvert;
+                        $fieldsToAddInner[] = $dd;
+                    } else {
+                        $fieldsToAddInner[] = $dd;
+                        $fieldsToAddInner[] = $ddInvert;
+                    }
+                } else {
+                    $fieldsToAddInner[] = $dd;
                 }
             }
             $fields->removeByName($fieldName);
