@@ -13,6 +13,7 @@ use SilverStripe\Forms\FieldGroup;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\LiteralField;
 use SilverStripe\Forms\Tab;
+use SilverStripe\ORM\FieldType\DBHTMLText;
 use Sunnysideup\SelectedColourPicker\Model\Fields\DBBackgroundColour;
 use Sunnysideup\SelectedColourPicker\Model\Fields\DBFontColour;
 
@@ -52,14 +53,14 @@ class BaseElementExtension extends Extension
 
     private static $field_labels = [
         'ElementBackgroundColour' => 'Background Colour',
-        'ElementTextColour' => 'Font Colour',
-        'TopMargin' => 'Top Margin (space outside block)',
-        'InvertTopMargin' => 'Invert Top Margin - overlap with previous block?',
-        'TopPadding' => 'Top Padding (space inside block)',
-        'ElementWidth' => 'Width of content',
-        'BottomPadding' => 'Bottom Padding (space inside block)',
-        'BottomMargin' => 'Bottom Margin (space outside block)',
-        'InvertBottomMargin' => 'Invert Bottom Margin - overlap with next block?',
+        'ElementTextColour' => 'Font (text) Colour',
+        'TopMargin' => 'Top Margin (space above block)',
+        'InvertTopMargin' => 'Overlap with previous block (invert top margin)?',
+        'TopPadding' => 'Top Padding (top space inside block)',
+        'ElementWidth' => 'Width of content within block',
+        'BottomPadding' => 'Bottom Padding (bottom space inside block)',
+        'BottomMargin' => 'Bottom Margin (space below block)',
+        'InvertBottomMargin' => 'Overlap with next block (invert bottom margin)?',
     ];
 
 
@@ -110,9 +111,12 @@ class BaseElementExtension extends Extension
             $options,
             $options
         );
-
         if ($owner->hasMethod('getCustomElementWidthValues')) {
             $elementWidthValues = $owner->getCustomElementWidthValues($elementWidthValues);
+        }
+        $allowedInvertedMargins = true;
+        if ($owner->hasMethod('AllowInvertedMargins')) {
+            $allowedInvertedMargins = $owner->AllowInvertedMargins();
         }
         $settings = [
             'TopMargin' => $topMarginValues,
@@ -123,25 +127,10 @@ class BaseElementExtension extends Extension
         ];
         $fieldsToAdd = [];
         $fieldsToAddInner = [];
-        $isTop = true;
         foreach ($settings as $fieldName => $values) {
             if (!empty($values)) {
+                $fieldsToAddInner = [];
                 //add top ones together
-                if ($fieldName === 'ElementWidth' && !empty($fieldsToAddInner)) {
-                    $fieldsToAdd[] = FieldGroup::create(
-                        $fieldsToAddInner
-                    );
-                    $fieldsToAddInner = [];
-                } elseif (strpos($fieldName, 'Bottom') === 0 && $isTop) {
-                    // adds middle one
-                    if (! empty($fieldsToAddInner)) {
-                        $fieldsToAdd[] = FieldGroup::create(
-                            $fieldsToAddInner
-                        );
-                        $fieldsToAddInner = [];
-                    }
-                    $isTop = false;
-                }
                 $label = $labels[$fieldName] ?? $fieldName;
                 $dd = DropdownField::create(
                     $fieldName,
@@ -153,15 +142,15 @@ class BaseElementExtension extends Extension
                         'Invert' . $fieldName,
                         $labels['Invert' . $fieldName] ?? 'Invert ' . $label . ' - overlap with ' . ($fieldName === 'TopMargin' ? 'previous' : 'next') . ' block?'
                     );
-                    if ($fieldName === 'TopMargin') {
-                        $fieldsToAddInner[] = $ddInvert;
-                        $fieldsToAddInner[] = $dd;
-                    } else {
-                        $fieldsToAddInner[] = $dd;
-                        $fieldsToAddInner[] = $ddInvert;
-                    }
+                    $fieldsToAddInner[] = $dd;
+                    $fieldsToAddInner[] = $ddInvert;
                 } else {
                     $fieldsToAddInner[] = $dd;
+                }
+                if (! empty($fieldsToAddInner)) {
+                    $fieldsToAdd[] = FieldGroup::create(
+                        $fieldsToAddInner
+                    );
                 }
             }
             $fields->removeByName($fieldName);
@@ -169,11 +158,7 @@ class BaseElementExtension extends Extension
                 $fields->removeByName('Invert' . $fieldName);
             }
         }
-        if (! empty($fieldsToAddInner)) {
-            $fieldsToAdd[] = FieldGroup::create(
-                $fieldsToAddInner
-            );
-        }
+
         if (! empty($fieldsToAdd)) {
 
             $fields->insertAfter(
