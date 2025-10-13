@@ -55,12 +55,12 @@ class BaseElementExtension extends Extension
         'ElementBackgroundColour' => 'Background Colour',
         'ElementTextColour' => 'Font (text) Colour',
         'TopMargin' => 'Top Margin (space above block)',
-        'InvertTopMargin' => 'Overlap with previous block (invert top margin)?',
+        'InvertTopMargin' => 'Overlap with previous block instead of adding space (invert top margin)?',
         'TopPadding' => 'Top Padding (top space inside block)',
         'ElementWidth' => 'Width of content within block',
         'BottomPadding' => 'Bottom Padding (bottom space inside block)',
         'BottomMargin' => 'Bottom Margin (space below block)',
-        'InvertBottomMargin' => 'Overlap with next block (invert bottom margin)?',
+        'InvertBottomMargin' => 'Overlap with next block instead of adding space (invert bottom margin)?',
     ];
 
 
@@ -81,8 +81,6 @@ class BaseElementExtension extends Extension
     {
         $owner = $this->getOwner();
         $labels = $owner->fieldLabels();
-
-
 
         $options = $owner->config()->get('margin_and_padding_options');
         $marginAndPaddingOptions = array_combine(
