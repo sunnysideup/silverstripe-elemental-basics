@@ -54,24 +54,24 @@ class BaseElementExtension extends Extension
     private static $field_labels = [
         'ElementBackgroundColour' => 'Background Colour',
         'ElementTextColour' => 'Font Colour',
-        'TopMargin' => 'Top Margin (space above block)',
+        'TopMargin' => 'Top Margin',
         'InvertTopMargin' => 'Overlap with previous block instead of adding space (invert top margin)?',
-        'TopPadding' => 'Top Padding (top space inside block)',
+        'TopPadding' => 'Top Padding',
         'ElementWidth' => 'Width of content within block',
-        'BottomPadding' => 'Bottom Padding (bottom space inside block)',
-        'BottomMargin' => 'Bottom Margin (space below block)',
+        'BottomPadding' => 'Bottom Padding',
+        'BottomMargin' => 'Bottom Margin',
         'InvertBottomMargin' => 'Overlap with next block instead of adding space (invert bottom margin)?',
     ];
 
     private static $field_labels_right = [
-        'ElementBackgroundColour' => 'Background Colour',
+        'ElementBackgroundColour' => '',
         'ElementTextColour' => 'This is the colour of text, links, and icons',
-        'TopMargin' => 'Top Margin (space above block)',
-        'InvertTopMargin' => 'Overlap with previous block instead of adding space (invert top margin)?',
+        'TopMargin' => 'Space above block',
+        'InvertTopMargin' => '',
         'TopPadding' => 'Top space inside block',
         'ElementWidth' => 'Width of content within block',
-        'BottomPadding' => 'Bottom Padding (bottom space inside block)',
-        'BottomMargin' => 'Bottom Margin (space below block)',
+        'BottomPadding' => 'Bottom space inside block',
+        'BottomMargin' => 'Space below block',
         'InvertBottomMargin' => 'Overlap with next block instead of adding space (invert bottom margin)?',
     ];
 
