@@ -55,12 +55,12 @@ class BaseElementExtension extends Extension
         'ElementBackgroundColour' => 'Background Colour',
         'ElementTextColour' => 'Font Colour',
         'TopMargin' => 'Top Margin',
-        'InvertTopMargin' => 'Overlap with previous block instead of adding space (invert top margin)?',
+        'InvertTopMargin' => 'Overlap with previous block instead of adding space (invert top margin selected below)?',
         'TopPadding' => 'Top Padding',
         'ElementWidth' => 'Content Width',
         'BottomPadding' => 'Bottom Padding',
         'BottomMargin' => 'Bottom Margin',
-        'InvertBottomMargin' => 'Overlap with next block instead of adding space (invert bottom margin)?',
+        'InvertBottomMargin' => 'Overlap with next block instead of adding space (invert bottom margin selected above)?',
     ];
 
     private static $field_labels_right = [
@@ -138,7 +138,6 @@ class BaseElementExtension extends Extension
         ];
         $fieldsToAdd = [];
         foreach ($settings as $fieldName => $values) {
-            $fieldsToAddInner = [];
             $fields->removeByName($fieldName);
             if ($fieldName === 'TopMargin' || $fieldName === 'BottomMargin') {
                 $fields->removeByName('Invert' . $fieldName);
@@ -146,14 +145,14 @@ class BaseElementExtension extends Extension
             if (!empty($values)) {
                 //add top ones together
                 $label = $labels[$fieldName] ?? $fieldName;
-                $fieldsToAddInner[] = DropdownField::create(
+                $dd = DropdownField::create(
                     $fieldName,
                     $label,
                     $values
                 )->setDescription(
                     $labelsRight[$fieldName] ?? ''
                 );
-                if ($fieldName === 'TopMargin' || $fieldName === 'BottomMargin') {
+                if (($fieldName === 'TopMargin' || $fieldName === 'BottomMargin') && $allowedInvertedMargins) {
                     $ddInvert = CheckboxField::create(
                         'Invert' . $fieldName,
                         $labels['Invert' . $fieldName] ?? 'Invert ' . $label . ' - overlap with ' . ($fieldName === 'TopMargin' ? 'previous' : 'next') . ' block?'
@@ -161,13 +160,16 @@ class BaseElementExtension extends Extension
                         ->setDescription(
                             $labelsRight['Invert' . $fieldName] ?? ''
                         );
-                    $fieldsToAddInner[] = $ddInvert;
+                    if ($fieldName === 'TopMargin') {
+                        $fieldsToAdd[] = $ddInvert;
+                        $fieldsToAdd[] = $dd;
+                    } else {
+                        $fieldsToAdd[] = $dd;
+                        $fieldsToAdd[] = $ddInvert;
+                    }
+                } else {
+                    $fieldsToAdd[] = $dd;
                 }
-            }
-            if (! empty($fieldsToAddInner)) {
-                $fieldsToAdd[] = FieldGroup::create(
-                    $fieldsToAddInner
-                );
             }
         }
 
