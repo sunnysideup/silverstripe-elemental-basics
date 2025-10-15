@@ -57,7 +57,7 @@ class BaseElementExtension extends Extension
         'TopMargin' => 'Top Margin',
         'InvertTopMargin' => 'Overlap with previous block instead of adding space (invert top margin)?',
         'TopPadding' => 'Top Padding',
-        'ElementWidth' => 'Width of content within block',
+        'ElementWidth' => 'Content Width',
         'BottomPadding' => 'Bottom Padding',
         'BottomMargin' => 'Bottom Margin',
         'InvertBottomMargin' => 'Overlap with next block instead of adding space (invert bottom margin)?',
@@ -72,7 +72,7 @@ class BaseElementExtension extends Extension
         'ElementWidth' => 'Width of content within block',
         'BottomPadding' => 'Bottom space inside block',
         'BottomMargin' => 'Space below block',
-        'InvertBottomMargin' => 'Overlap with next block instead of adding space (invert bottom margin)?',
+        'InvertBottomMargin' => '',
     ];
 
 
@@ -93,6 +93,7 @@ class BaseElementExtension extends Extension
     {
         $owner = $this->getOwner();
         $labels = $owner->fieldLabels();
+        $labelsRight = $owner->config()->get('field_labels_right') ?: [];
 
         $options = $owner->config()->get('margin_and_padding_options');
         $marginAndPaddingOptions = array_combine(
@@ -149,12 +150,17 @@ class BaseElementExtension extends Extension
                     $fieldName,
                     $label,
                     $values
+                )->setDescription(
+                    $labelsRight[$fieldName] ?? ''
                 );
                 if ($fieldName === 'TopMargin' || $fieldName === 'BottomMargin') {
                     $ddInvert = CheckboxField::create(
                         'Invert' . $fieldName,
                         $labels['Invert' . $fieldName] ?? 'Invert ' . $label . ' - overlap with ' . ($fieldName === 'TopMargin' ? 'previous' : 'next') . ' block?'
-                    );
+                    )
+                        ->setDescription(
+                            $labelsRight['Invert' . $fieldName] ?? ''
+                        );
                     $fieldsToAddInner[] = $ddInvert;
                 }
             }
@@ -200,7 +206,11 @@ class BaseElementExtension extends Extension
                     $fieldName,
                     $label,
                     $values,
-                )->setEmptyString('-- select colour --');
+                )
+                    ->setEmptyString('-- select colour --')
+                    ->setDescription(
+                        $labelsRight[$fieldName] ?? ''
+                    );
             }
             $fields->removeByName($fieldName);
         }
