@@ -14,10 +14,9 @@
     ],
     "license": "BSD-3-Clause",
     "require": {
-        "silverstripe/framework": "^5.0",
-        "silverstripe/admin": "^2.0",
-        "dnadesign/silverstripe-elemental": "^5",
-        "sunnysideup/selected-colour-picker": "^5.0-dev"
+        "silverstripe/framework": "^6.0",
+        "silverstripe/admin": "^3.0",
+        "dnadesign/silverstripe-elemental": "^6.0"
     },
     "require-dev": {
         "sunnysideup/sswebpack_engine_only": "^5.0-dev",
@@ -40,5 +39,12 @@
             "email": "modules@sunnysideup.co.nz",
             "role": "lead developer"
         }
-    ]
+    ],
+    "yet-to-update": {
+        "sunnysideup/selected-colour-picker": {
+            "section": "require",
+            "current": "^5.0-dev",
+            "reason": "no-compatible-stable-release"
+        }
+    }
 }
