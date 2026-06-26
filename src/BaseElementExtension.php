@@ -225,7 +225,7 @@ class BaseElementExtension extends Extension
             $fields->removeByName($fieldName);
         }
 
-        if (!empty($fieldsToAdd)) {
+        if ($fieldsToAdd !== []) {
             $fieldsToAdd[] =
                 LiteralField::create('ColourHack', '
                     <style>
