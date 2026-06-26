@@ -4,23 +4,21 @@ declare(strict_types=1);
 
 namespace Sunnysideup\ElementalBasics\Extensions;
 
-use Dom\Element;
+use DNADesign\Elemental\Models\BaseElement;
 use Fromholdio\ColorPalette\Fields\ColorPaletteField;
 use SilverStripe\Core\Extension;
 use SilverStripe\Forms\CheckboxField;
 use SilverStripe\Forms\DropdownField;
-use SilverStripe\Forms\FieldGroup;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\LiteralField;
 use SilverStripe\Forms\Tab;
-use SilverStripe\ORM\FieldType\DBHTMLText;
 use Sunnysideup\SelectedColourPicker\Model\Fields\DBBackgroundColour;
 use Sunnysideup\SelectedColourPicker\Model\Fields\DBFontColour;
 
 /**
  * Class \Sunnysideup\ElementalBasics\Extensions\BaseElementExtension
  *
- * @property \DNADesign\Elemental\Models\BaseElement|\App\Website\Extension\BaseElementExtension $owner
+ * @property BaseElement|\App\Website\Extension\BaseElementExtension $owner
  */
 class BaseElementExtension extends Extension
 {
@@ -108,15 +106,19 @@ class BaseElementExtension extends Extension
         if ($owner->hasMethod('getCustomTopMarginValues')) {
             $topMarginValues = $this->makeArrayAssociativeForCMSFields($owner->getCustomTopMarginValues($topMarginValues));
         }
+
         if ($owner->hasMethod('getCustomTopPaddingValues')) {
             $topPaddingValues = $this->makeArrayAssociativeForCMSFields($owner->getCustomTopPaddingValues($topPaddingValues));
         }
+
         if ($owner->hasMethod('getCustomBottomPaddingValues')) {
             $bottomPaddingValues = $this->makeArrayAssociativeForCMSFields($owner->getCustomBottomPaddingValues($bottomPaddingValues));
         }
+
         if ($owner->hasMethod('getCustomBottomMarginValues')) {
             $bottomMarginValues = $this->makeArrayAssociativeForCMSFields($owner->getCustomBottomMarginValues($bottomMarginValues));
         }
+
         $options = $owner->config()->get('element_width_options');
         $elementWidthValues = array_combine(
             $options,
@@ -125,10 +127,12 @@ class BaseElementExtension extends Extension
         if ($owner->hasMethod('getCustomElementWidthValues')) {
             $elementWidthValues = $owner->getCustomElementWidthValues($elementWidthValues);
         }
+
         $allowedInvertedMargins = true;
         if ($owner->hasMethod('AllowInvertedMargins')) {
             $allowedInvertedMargins = $owner->AllowInvertedMargins();
         }
+
         $settings = [
             'TopMargin' => $topMarginValues,
             'TopPadding' => $topPaddingValues,
@@ -142,6 +146,7 @@ class BaseElementExtension extends Extension
             if ($fieldName === 'TopMargin' || $fieldName === 'BottomMargin') {
                 $fields->removeByName('Invert' . $fieldName);
             }
+
             if (!empty($values)) {
                 //add top ones together
                 $label = $labels[$fieldName] ?? $fieldName;
@@ -192,17 +197,19 @@ class BaseElementExtension extends Extension
             $backgroundColours = $this->makeArrayAssociativeForCMSFields($owner->getCustomBackgroundColours($backgroundColours));
             $backgroundColours = $this->alignColoursForCMSFields($backgroundColours);
         }
+
         if ($owner->hasMethod('getCustomTextColours')) {
             $textColours = $this->makeArrayAssociativeForCMSFields($owner->getCustomTextColours($textColours));
             $textColours = $this->alignColoursForCMSFields($textColours);
         }
+
         $fieldsToAdd = [];
         $colours = [
             'ElementBackgroundColour' => $backgroundColours,
             'ElementTextColour' => $textColours,
         ];
         foreach ($colours as $fieldName => $values) {
-            if (! empty($values)) {
+            if ($values !== null && $values !== []) {
                 $label = $labels[$fieldName] ?? $fieldName;
                 $fieldsToAdd[] = ColorPaletteField::create(
                     $fieldName,
@@ -214,14 +221,13 @@ class BaseElementExtension extends Extension
                         $labelsRight[$fieldName] ?? ''
                     );
             }
+
             $fields->removeByName($fieldName);
         }
 
         if (!empty($fieldsToAdd)) {
             $fieldsToAdd[] =
-                new LiteralField(
-                    'ColourHack',
-                    '
+                LiteralField::create('ColourHack', '
                     <style>
 
                         .ColorPaletteField.colorpalettefield.ColorPaletteField li.ColorPaletteField__color label:before {
@@ -234,8 +240,7 @@ class BaseElementExtension extends Extension
                             }
                         }
                     </style>
-                '
-                );
+                ');
 
             $fields->insertAfter(
                 'Main',
@@ -255,30 +260,37 @@ class BaseElementExtension extends Extension
         if ($owner->ElementBackgroundColour) {
             $styleVariant .= ' bg-' . str_replace('#', '', $owner->ElementBackgroundColour);
         }
+
         if ($owner->ElementTextColour) {
             $styleVariant .= ' text-' . str_replace('#', '', $owner->ElementTextColour);
         }
+
         if ($owner->TopPadding && $owner->TopPadding !== 'none') {
             $styleVariant .= ' pt-' . $owner->TopPadding;
         }
+
         if ($owner->BottomPadding && $owner->BottomPadding !== 'none') {
             $styleVariant .= ' pb-' . $owner->BottomPadding;
         }
+
         if ($owner->ElementWidth && $owner->ElementWidth !== 'none') {
             $styleVariant .= ' ew-' . $owner->ElementWidth;
         }
+
         if ($owner->TopMargin && $owner->TopMargin !== 'none') {
             $styleVariant .= ' mt-' . $owner->TopMargin;
             if ($owner->InvertTopMargin) {
                 $styleVariant .= ' mt-invert';
             }
         }
+
         if ($owner->BottomMargin && $owner->BottomMargin !== 'none') {
             $styleVariant .= ' mb-' . $owner->BottomMargin;
             if ($owner->InvertBottomMargin) {
                 $styleVariant .= ' mb-invert';
             }
         }
+
         return trim($styleVariant);
     }
 
@@ -288,8 +300,10 @@ class BaseElementExtension extends Extension
         if ($owner->config()->enable_title_in_template) {
             return $owner->getField('Title');
         }
+
         return 'page-section-' . ($owner->getField('Title') ?: '#' . $owner->ID);
     }
+
     protected function makeArrayAssociativeForCMSFields(array $list): array
     {
         if ($list === [] || array_keys($list) !== range(0, count($list) - 1)) {
@@ -312,6 +326,7 @@ class BaseElementExtension extends Extension
                 ];
             }
         }
+
         return $colours;
     }
 }
