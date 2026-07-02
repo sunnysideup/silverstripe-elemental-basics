@@ -22,8 +22,21 @@ use Sunnysideup\SelectedColourPicker\Model\Fields\DBFontColour;
  */
 class BaseElementExtension extends Extension
 {
-
     private static $margin_and_padding_options = [
+        // 'none',
+        // 'small',
+        // 'medium',
+        // 'large',
+        // 'xlarge',
+    ];
+    private static $margin_only_options = [
+        // 'none',
+        // 'small',
+        // 'medium',
+        // 'large',
+        // 'xlarge',
+    ];
+    private static $padding_only_options = [
         // 'none',
         // 'small',
         // 'medium',
@@ -94,14 +107,21 @@ class BaseElementExtension extends Extension
         $labelsRight = $owner->config()->get('field_labels_right') ?: [];
 
         $options = $owner->config()->get('margin_and_padding_options');
-        $marginAndPaddingOptions = array_combine(
-            $options,
-            $options
+        $marginOptions = $owner->config()->get('margin_only_options') ?: $options;
+        $paddingOptions = $owner->config()->get('padding_only_options') ?: $options;
+        $marginOptions = array_combine(
+            $marginOptions,
+            $marginOptions
         );
-        $topMarginValues = $marginAndPaddingOptions;
-        $topPaddingValues = $marginAndPaddingOptions;
-        $bottomPaddingValues = $marginAndPaddingOptions;
-        $bottomMarginValues = $marginAndPaddingOptions;
+        $paddingOptions = array_combine(
+            $paddingOptions,
+            $paddingOptions
+        );
+
+        $topMarginValues = $marginOptions;
+        $topPaddingValues = $paddingOptions;
+        $bottomPaddingValues = $paddingOptions;
+        $bottomMarginValues = $marginOptions;
 
         if ($owner->hasMethod('getCustomTopMarginValues')) {
             $topMarginValues = $this->makeArrayAssociativeForCMSFields($owner->getCustomTopMarginValues($topMarginValues));
