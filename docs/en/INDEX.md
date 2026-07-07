@@ -137,10 +137,10 @@ Here is a css example that you may want to set up to cover the colours and the l
 .mt-medium { margin-top: var(--space-medium); }
 .mt-large { margin-top: var(--space-large); }
 .mt-xlarge { margin-top: var(--space-xlarge); }
-.mt-small-invert { margin-top: calc(var(--space-small) * -1); }
-.mt-medium-invert { margin-top: calc(var(--space-medium) * -1); }
-.mt-large-invert { margin-top: calc(var(--space-large) * -1); }
-.mt-xlarge-invert { margin-top: calc(var(--space-xlarge) * -1); }
+.mt-small.mt-invert { margin-top: calc(var(--space-small) * -1); }
+.mt-medium.mt-invert { margin-top: calc(var(--space-medium) * -1); }
+.mt-large.mt-invert { margin-top: calc(var(--space-large) * -1); }
+.mt-xlarge.mt-invert { margin-top: calc(var(--space-xlarge) * -1); }
 
 /* Margin bottom */
 .mb-none { margin-bottom: var(--space-none); }
@@ -148,8 +148,8 @@ Here is a css example that you may want to set up to cover the colours and the l
 .mb-medium { margin-bottom: var(--space-medium); }
 .mb-large { margin-bottom: var(--space-large); }
 .mb-xlarge { margin-bottom: var(--space-xlarge); }
-.mb-small-invert { margin-bottom: calc(var(--space-small) * -1); }
-.mb-medium-invert { margin-bottom: calc(var(--space-medium) * -1); }
-.mb-large-invert { margin-bottom: calc(var(--space-large) * -1); }
-.mb-xlarge-invert { margin-bottom: calc(var(--space-xlarge) * -1); }
+.mb-small.mt-invert { margin-bottom: calc(var(--space-small) * -1); }
+.mb-medium.mt-invert { margin-bottom: calc(var(--space-medium) * -1); }
+.mb-large.mt-invert { margin-bottom: calc(var(--space-large) * -1); }
+.mb-xlarge.mt-invert { margin-bottom: calc(var(--space-xlarge) * -1); }
 ```
