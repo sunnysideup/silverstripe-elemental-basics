@@ -201,7 +201,7 @@ class BaseElementExtension extends Extension
         if (! empty($fieldsToAdd)) {
 
             $fields->insertAfter(
-                'Main',
+                'Settings',
                 Tab::create(
                     'Spacing',
                     'Spacing',
@@ -263,7 +263,7 @@ class BaseElementExtension extends Extension
                 ');
 
             $fields->insertAfter(
-                'Main',
+                'Settings',
                 Tab::create(
                     'Colours',
                     'Colours',
